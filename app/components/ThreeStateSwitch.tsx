@@ -14,15 +14,17 @@ interface SwitchProps {
 
 const Switch = ({ answers, onSelect, correctPercentage }: SwitchProps) => {
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
+  const [toggleState, SetToggleState] = useState(0);
   const options = [answers.correct, ...answers.incorrect];
 
-  const handleClick = (value: string) => {
+  const handleClick = (value: string, index: number) => {
     if (correctPercentage === 100) return;
+    SetToggleState(index);
     setSelectedValue(value);
     const isCorrect = value === answers.correct;
     onSelect(value, isCorrect);
   };
-  const [toggleState, SetToggleState] = useState(0);
+
   const getTranslateXClass = () => {
     switch (toggleState) {
       case 0:
@@ -37,7 +39,7 @@ const Switch = ({ answers, onSelect, correctPercentage }: SwitchProps) => {
   };
   return (
     <div className="flex items-center rounded-full bg-transparent border m-2 w-fit shadow-lg">
-      <button
+      <div
         className={`relative w-[600px] h-12 flex items-center rounded-full transition-colors duration-300
         `}
       >
@@ -47,11 +49,12 @@ const Switch = ({ answers, onSelect, correctPercentage }: SwitchProps) => {
         {options.map((option, index) => (
           <span
             onClick={() => {
-              SetToggleState(index);
-              handleClick(option);
+              handleClick(option, index);
             }}
             key={index}
-            className={`relative z-10 flex-1 text-center py-2 transition-colors duration-300 
+            className={`relative z-10 flex-1 text-center py-2 transition-colors duration-300 ${
+              correctPercentage !== 100 ? "cursor-pointer" : ""
+            }
                     ${
                       selectedValue !== option
                         ? "text-white hover:text-gray-100"
@@ -61,7 +64,7 @@ const Switch = ({ answers, onSelect, correctPercentage }: SwitchProps) => {
             {option}
           </span>
         ))}
-      </button>
+      </div>
     </div>
   );
 };
