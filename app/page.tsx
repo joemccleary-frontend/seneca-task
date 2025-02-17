@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
-import Switch from "./components/Toggle";
+import TwoStateSwitch from "./components/TwoStateSwitch";
+import ThreeStateSwitch from "./components/ThreeStateSwitch";
 
 export default function Home() {
   const [correctPercentage, setCorrectPercentage] = useState(0);
@@ -9,7 +10,7 @@ export default function Home() {
     question: "An animal cell contains",
     answers: [
       {
-        incorrect: ["Cell wall"],
+        incorrect: ["Cell wall", "Hibbiernean"],
         correct: "Ribosomes",
       },
       {
@@ -70,14 +71,27 @@ export default function Home() {
       <div className="text-white text-2xl m-6">{questionData.question}</div>
 
       {questionData.answers.map((answer, index) => (
-        <Switch
-          key={index}
-          answers={answer}
-          onSelect={(selected, isCorrect) =>
-            handleAnswerSelect(index, selected, isCorrect)
-          }
-          correctPercentage={correctPercentage}
-        />
+        <>
+          {answer.incorrect.length === 1 ? (
+            <TwoStateSwitch
+              key={index}
+              answers={answer}
+              onSelect={(selected, isCorrect) =>
+                handleAnswerSelect(index, selected, isCorrect)
+              }
+              correctPercentage={correctPercentage}
+            />
+          ) : (
+            <ThreeStateSwitch
+              key={index}
+              answers={answer}
+              onSelect={(selected, isCorrect) =>
+                handleAnswerSelect(index, selected, isCorrect)
+              }
+              correctPercentage={correctPercentage}
+            />
+          )}
+        </>
       ))}
       <div className="text-white text-2xl m-6">
         The answer is {correctPercentage === 100 ? "correct" : "incorrect"}

@@ -12,7 +12,11 @@ interface SwitchProps {
   correctPercentage: number;
 }
 
-const Switch = ({ answers, onSelect, correctPercentage }: SwitchProps) => {
+const TwoStateSwitch = ({
+  answers,
+  onSelect,
+  correctPercentage,
+}: SwitchProps) => {
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
   const options = [answers.correct, ...answers.incorrect];
 
@@ -22,36 +26,26 @@ const Switch = ({ answers, onSelect, correctPercentage }: SwitchProps) => {
     const isCorrect = value === answers.correct;
     onSelect(value, isCorrect);
   };
-  const [toggleState, SetToggleState] = useState(0);
-  const getTranslateXClass = () => {
-    switch (toggleState) {
-      case 0:
-        return "translate-x-0";
-      case 1:
-        return "translate-x-full";
-      case 2:
-        return "translate-x-[200%]";
-      default:
-        return "";
-    }
-  };
+  const [isOn, setIsOn] = useState(false);
+
   return (
-    <div className="flex items-center rounded-full bg-transparent border m-2 w-fit shadow-lg">
+    <div className="flex items-center rounded-full bg-transparent border p-1 w-fit m-2 shadow-lg">
       <button
-        className={`relative w-[600px] h-12 flex items-center rounded-full transition-colors duration-300
+        className={`relative w-48 h-12 flex items-center rounded-full p-1 transition-colors duration-300
         `}
       >
         <div
-          className={`absolute h-12 w-[200px] rounded-full transition-transform duration-300 bg-white bg-opacity-40 ${getTranslateXClass()}`}
+          className={`absolute left-1 top-1 h-10 w-24 rounded-full transition-transform duration-300 bg-orange-100 
+          ${isOn ? "translate-x-full" : "translate-x-0"}`}
         />
         {options.map((option, index) => (
           <span
             onClick={() => {
-              SetToggleState(index);
+              setIsOn(!isOn);
               handleClick(option);
             }}
             key={index}
-            className={`relative z-10 flex-1 text-center py-2 transition-colors duration-300 
+            className={`relative z-10 flex-1 text-center transition-colors duration-300 
                     ${
                       selectedValue !== option
                         ? "text-white hover:text-gray-100"
@@ -66,4 +60,4 @@ const Switch = ({ answers, onSelect, correctPercentage }: SwitchProps) => {
   );
 };
 
-export default Switch;
+export default TwoStateSwitch;
