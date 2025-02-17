@@ -20,6 +20,10 @@ export default function Home() {
         incorrect: ["Mitochondria"],
         correct: "Cellulose",
       },
+      {
+        incorrect: ["Mitochondria"],
+        correct: "Cellulose",
+      },
     ],
   };
   const [correctAnswers, setCorrectAnswers] = useState(
@@ -31,7 +35,6 @@ export default function Home() {
     selected: string,
     isCorrect: boolean
   ) => {
-    console.log("blah", index, selected, isCorrect);
     const updatedCorrectAnswers = [...correctAnswers];
     updatedCorrectAnswers[index] = isCorrect;
 
@@ -49,18 +52,22 @@ export default function Home() {
 
   const calculateBackgroundColour = () => {
     if (correctPercentage === 0) {
-      return "bg-red-200";
-    } else if (correctPercentage === 100) {
-      return "bg-blue-200";
+      return "bg-gradient-to-b from-[#f6b868] to-[#ee6c2e]"; // Darkest
+    } else if (correctPercentage <= 33) {
+      return "bg-gradient-to-b from-[#fecc61] to-[#ff8300]"; // Dark
+    } else if (correctPercentage <= 50) {
+      return "bg-gradient-to-b from-[#fed954] to-[#ff9700]"; // Orange-yellow transition
+    } else if (correctPercentage < 100) {
+      return "bg-gradient-to-b from-[#ffe34b] to-[#ffab00]"; // Lightest yellow
     } else {
-      const colorIntensity = Math.ceil((correctPercentage / 100) * 6) * 100;
-      return `bg-blue-${colorIntensity}`;
+      return "bg-gradient-to-b from-[#75dfc2] to-[#59cada]"; // Success turquoise
     }
   };
-
   return (
-    <div className={`${calculateBackgroundColour()}`}>
-      {questionData.question}
+    <div
+      className={`h-screen w-screen flex flex-col justify-center items-center ${calculateBackgroundColour()}`}
+    >
+      <div className="text-white text-2xl m-6">{questionData.question}</div>
 
       {questionData.answers.map((answer, index) => (
         <Switch
@@ -69,9 +76,10 @@ export default function Home() {
           onSelect={(selected, isCorrect) =>
             handleAnswerSelect(index, selected, isCorrect)
           }
+          correctPercentage={correctPercentage}
         />
       ))}
-      <div>
+      <div className="text-white text-2xl m-6">
         The answer is {correctPercentage === 100 ? "correct" : "incorrect"}
       </div>
     </div>
