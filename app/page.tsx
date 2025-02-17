@@ -10,7 +10,7 @@ export default function Home() {
     question: "An animal cell contains",
     answers: [
       {
-        incorrect: ["Cell wall", "Hibbiernean"],
+        incorrect: ["Cell wall"],
         correct: "Ribosomes",
       },
       {
@@ -18,8 +18,8 @@ export default function Home() {
         correct: "Chloroplast",
       },
       {
-        incorrect: ["Mitochondria"],
-        correct: "Cellulose",
+        incorrect: ["Partially permeable membrane"],
+        correct: "Permeable membrane",
       },
       {
         incorrect: ["Mitochondria"],
@@ -27,8 +27,21 @@ export default function Home() {
       },
     ],
   };
+
+  // Randomly select one index to start as correct
+  const initialCorrectIndex = Math.floor(
+    Math.random() * questionData.answers.length
+  );
+
+  // Initialize state with default selections
+  const [selectedAnswers, setSelectedAnswers] = useState(
+    questionData.answers.map((answer, index) =>
+      index === initialCorrectIndex ? answer.correct : answer.incorrect[0]
+    )
+  );
+
   const [correctAnswers, setCorrectAnswers] = useState(
-    Array(questionData.answers.length).fill(false)
+    questionData.answers.map((_, index) => index === initialCorrectIndex)
   );
 
   const handleAnswerSelect = (
@@ -40,11 +53,13 @@ export default function Home() {
     updatedCorrectAnswers[index] = isCorrect;
 
     setCorrectAnswers(updatedCorrectAnswers);
-    console.log(updatedCorrectAnswers);
+    setSelectedAnswers((prev) => {
+      const newAnswers = [...prev];
+      newAnswers[index] = selected;
+      return newAnswers;
+    });
 
-    const totalCorrect = updatedCorrectAnswers.filter(
-      (isCorrect) => isCorrect
-    ).length;
+    const totalCorrect = updatedCorrectAnswers.filter(Boolean).length;
     const percentage = Math.round(
       (totalCorrect / questionData.answers.length) * 100
     );
@@ -71,11 +86,11 @@ export default function Home() {
       <div className="text-white text-2xl m-6">{questionData.question}</div>
 
       {questionData.answers.map((answer, index) => (
-        <>
+        <div key={index}>
           {answer.incorrect.length === 1 ? (
             <TwoStateSwitch
-              key={index}
               answers={answer}
+              defaultSelected={selectedAnswers[index]} // Default value
               onSelect={(selected, isCorrect) =>
                 handleAnswerSelect(index, selected, isCorrect)
               }
@@ -83,16 +98,17 @@ export default function Home() {
             />
           ) : (
             <ThreeStateSwitch
-              key={index}
               answers={answer}
+              defaultSelected={selectedAnswers[index]} // Default value
               onSelect={(selected, isCorrect) =>
                 handleAnswerSelect(index, selected, isCorrect)
               }
               correctPercentage={correctPercentage}
             />
           )}
-        </>
+        </div>
       ))}
+
       <div className="text-white text-2xl m-6">
         The answer is {correctPercentage === 100 ? "correct" : "incorrect"}
       </div>
