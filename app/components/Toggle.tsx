@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 
 interface Answer {
   incorrect: string[];
@@ -13,14 +13,7 @@ interface SwitchProps {
 
 const Switch = ({ answers, onSelect }: SwitchProps) => {
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
-  const [shuffledOptions, setShuffledOptions] = useState<string[]>([]);
-
-  useEffect(() => {
-    const optionsToShuffle = [...answers.incorrect, answers.correct];
-    const shuffled = optionsToShuffle.sort(() => Math.random() - 0.5);
-    setShuffledOptions(shuffled);
-    setSelectedValue(shuffled[0]);
-  }, [answers]);
+  const options = [answers.correct, ...answers.incorrect];
 
   const handleClick = (value: string) => {
     setSelectedValue(value);
@@ -30,7 +23,7 @@ const Switch = ({ answers, onSelect }: SwitchProps) => {
 
   return (
     <div className="flex items-center rounded-lg bg-gray-100 p-1 w-fit m-2">
-      {shuffledOptions.map((option) => (
+      {options.map((option) => (
         <div
           key={option}
           className={`px-4 py-2 rounded-lg cursor-pointer transition-colors 
