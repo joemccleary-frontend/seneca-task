@@ -69,17 +69,20 @@ const TwoStateSwitch = ({
   return (
     <div
       key={index}
-      className="flex items-center rounded-full bg-transparent border w-2/3 m-4 shadow-lg max-w-full"
+      className={`flex items-center bg-transparent border w-2/3 m-4 shadow-lg max-w-full ${
+        isOverflowing ? "rounded-[35px]" : "rounded-full"
+      }`}
     >
       <div
-        className={`relative w-full  h-12 flex items-center rounded-full transition-colors duration-300
-         ${isOverflowing ? "flex-col" : ""}`}
+        className={`relative w-full  flex items-center rounded-full transition-colors duration-300
+         ${isOverflowing ? "flex-col h-24" : " h-12"}`}
       >
         <div
-          className={`absolute h-12 w-1/2 rounded-full transition-transform duration-300 bg-white bg-opacity-40 
+          className={`absolute h-12 w-1/2 transition-transform duration-200 bg-white bg-opacity-40 
           ${!isOverflowing && isOn ? "translate-x-full" : "translate-x-0"} 
-          ${isOverflowing ? "w-full" : "translate-y-0"}
-          ${isOverflowing && isOn ? "translate-y-full" : ""}
+          ${isOverflowing ? "w-full h-12 rounded-b-[35px]" : "rounded-full"}
+          ${isOverflowing && !isOn ? "rounded-t-[35px] rounded-b-none" : ""}
+          ${isOverflowing && isOn ? "translate-y-full" : "translate-y-0"}
           `}
           ref={containerRef}
         />
@@ -97,7 +100,7 @@ const TwoStateSwitch = ({
                       selectedValue !== option
                         ? "text-white hover:text-gray-100"
                         : "text-[#9f938b]"
-                    } `}
+                    } ${isOverflowing ? "flex items-center" : ""}`}
           >
             {option}
           </span>
