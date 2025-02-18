@@ -86,14 +86,14 @@ const TwoStateSwitch = ({
             }}
             key={index}
             ref={spanRef}
-            className={`relative z-10 flex-1 text-center transition-colors duration-300 ${
+            className={`relative z-10 flex-1 text-center transition-colors duration-300 flex justify-center items-center ${
               correctPercentage !== 100 ? "cursor-pointer" : ""
             }
                     ${
                       selectedValue !== option
                         ? "text-white hover:text-gray-100"
                         : "text-[#9f938b]"
-                    } ${isOverflowing ? "flex items-center" : ""}`}
+                    } ${!isOverflowing ? "min-h-full " : ""}`}
           >
             {option}
           </span>
