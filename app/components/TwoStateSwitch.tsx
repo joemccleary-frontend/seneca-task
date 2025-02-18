@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 interface Answer {
   incorrect: string[];
@@ -11,6 +11,7 @@ interface SwitchProps {
   onSelect: (selected: string, isCorrect: boolean) => void;
   defaultSelected: string;
   correctPercentage: number;
+  index: number;
 }
 
 const TwoStateSwitch = ({
@@ -18,14 +19,40 @@ const TwoStateSwitch = ({
   onSelect,
   defaultSelected,
   correctPercentage,
+  index,
 }: SwitchProps) => {
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
   const options = [answers.correct, ...answers.incorrect];
+  const [isOn, setIsOn] = useState(false);
+  const [isOverflowing, setIsOverflowing] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const spanRef = useRef<HTMLSpanElement>(null);
+
+  // Function to check if text is overflowing
+  const checkOverflow = () => {
+    console.log(containerRef, spanRef);
+    if (containerRef.current && spanRef.current) {
+      const container = containerRef.current;
+      const span = spanRef.current;
+      setIsOverflowing(container.clientHeight < span.clientHeight);
+      console.log(container.clientHeight, span.clientHeight);
+      console.log(
+        "overflow",
+        isOverflowing,
+        container.clientHeight > span.clientHeight
+      );
+    }
+  };
+
+  useEffect(() => {
+    checkOverflow();
+    window.addEventListener("resize", checkOverflow);
+    return () => window.removeEventListener("resize", checkOverflow);
+  }, []);
 
   useEffect(() => {
     if (defaultSelected) {
       setSelectedValue(defaultSelected);
-      console.log(answers.correct);
       if (answers.correct !== defaultSelected) setIsOn(true);
       onSelect(defaultSelected, answers.correct == defaultSelected);
     }
@@ -38,17 +65,23 @@ const TwoStateSwitch = ({
     const isCorrect = value === answers.correct;
     onSelect(value, isCorrect);
   };
-  const [isOn, setIsOn] = useState(false);
 
   return (
-    <div className="flex items-center rounded-full bg-transparent border w-fit m-2 shadow-lg">
+    <div
+      key={index}
+      className="flex items-center rounded-full bg-transparent border w-2/3 m-4 shadow-lg max-w-full"
+    >
       <div
-        className={`relative w-[600px] h-12 flex items-center rounded-full transition-colors duration-300
-        `}
+        className={`relative w-full  h-12 flex items-center rounded-full transition-colors duration-300
+         ${isOverflowing ? "flex-col" : ""}`}
       >
         <div
-          className={`absolute h-12 w-[300px] rounded-full transition-transform duration-300 bg-white bg-opacity-40 
-          ${isOn ? "translate-x-full" : "translate-x-0"}`}
+          className={`absolute h-12 w-1/2 rounded-full transition-transform duration-300 bg-white bg-opacity-40 
+          ${!isOverflowing && isOn ? "translate-x-full" : "translate-x-0"} 
+          ${isOverflowing ? "w-full" : "translate-y-0"}
+          ${isOverflowing && isOn ? "translate-y-full" : ""}
+          `}
+          ref={containerRef}
         />
         {options.map((option, index) => (
           <span
@@ -56,6 +89,7 @@ const TwoStateSwitch = ({
               handleClick(option);
             }}
             key={index}
+            ref={spanRef}
             className={`relative z-10 flex-1 text-center transition-colors duration-300 ${
               correctPercentage !== 100 ? "cursor-pointer" : ""
             }

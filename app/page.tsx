@@ -36,7 +36,9 @@ export default function Home() {
   // Initialize state with default selections
   const [selectedAnswers, setSelectedAnswers] = useState(
     questionData.answers.map((answer, index) =>
-      index === initialCorrectIndex ? answer.correct : answer.incorrect[0]
+      index === initialCorrectIndex
+        ? answer.correct
+        : answer.incorrect[Math.floor(Math.random() * answer.incorrect.length)]
     )
   );
 
@@ -84,30 +86,32 @@ export default function Home() {
       className={`h-screen w-screen flex flex-col justify-center items-center ${calculateBackgroundColour()}`}
     >
       <div className="text-white text-2xl m-6">{questionData.question}</div>
-
-      {questionData.answers.map((answer, index) => (
-        <div key={index}>
-          {answer.incorrect.length === 1 ? (
-            <TwoStateSwitch
-              answers={answer}
-              defaultSelected={selectedAnswers[index]} // Default value
-              onSelect={(selected, isCorrect) =>
-                handleAnswerSelect(index, selected, isCorrect)
-              }
-              correctPercentage={correctPercentage}
-            />
-          ) : (
-            <ThreeStateSwitch
-              answers={answer}
-              defaultSelected={selectedAnswers[index]} // Default value
-              onSelect={(selected, isCorrect) =>
-                handleAnswerSelect(index, selected, isCorrect)
-              }
-              correctPercentage={correctPercentage}
-            />
-          )}
-        </div>
-      ))}
+      <div className="w-full">
+        {questionData.answers.map((answer, index) => (
+          <div className="w-full place-items-center" key={index}>
+            {answer.incorrect.length === 1 ? (
+              <TwoStateSwitch
+                answers={answer}
+                defaultSelected={selectedAnswers[index]} // Default value
+                onSelect={(selected, isCorrect) =>
+                  handleAnswerSelect(index, selected, isCorrect)
+                }
+                correctPercentage={correctPercentage}
+                index={index}
+              />
+            ) : (
+              <ThreeStateSwitch
+                answers={answer}
+                defaultSelected={selectedAnswers[index]} // Default value
+                onSelect={(selected, isCorrect) =>
+                  handleAnswerSelect(index, selected, isCorrect)
+                }
+                correctPercentage={correctPercentage}
+              />
+            )}
+          </div>
+        ))}
+      </div>
 
       <div className="text-white text-2xl m-6">
         The answer is {correctPercentage === 100 ? "correct" : "incorrect"}
