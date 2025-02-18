@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import TwoStateSwitch from "./TwoStateSwitch";
 import ThreeStateSwitch from "./ThreeStateSwitch";
 import confetti from "canvas-confetti";
+
 interface Answer {
   incorrect: string[];
   correct: string;
@@ -106,7 +107,7 @@ export default function ToggleQuestion() {
       });
       setTimeout(() => {
         moveToNextQuestion();
-      }, 1500);
+      }, 1800);
     }
   };
 
@@ -179,6 +180,8 @@ export default function ToggleQuestion() {
                     <ThreeStateSwitch
                       answers={answer}
                       defaultSelected={selectedAnswers[qIndex]?.[index] || ""}
+                      defaultSelectedIndex={index}
+                      selectedAnswers={selectedAnswers}
                       onSelect={(selected, isCorrect) =>
                         handleAnswerSelect(index, selected, isCorrect)
                       }

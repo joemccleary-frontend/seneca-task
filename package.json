@@ -12,7 +12,8 @@
     "canvas-confetti": "^1.9.3",
     "next": "15.1.7",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "use-sound": "^4.0.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
