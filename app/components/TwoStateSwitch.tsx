@@ -30,17 +30,10 @@ const TwoStateSwitch = ({
 
   // Function to check if text is overflowing
   const checkOverflow = () => {
-    console.log(containerRef, spanRef);
     if (containerRef.current && spanRef.current) {
       const container = containerRef.current;
       const span = spanRef.current;
       setIsOverflowing(container.clientHeight < span.clientHeight);
-      console.log(container.clientHeight, span.clientHeight);
-      console.log(
-        "overflow",
-        isOverflowing,
-        container.clientHeight > span.clientHeight
-      );
     }
   };
 
@@ -69,18 +62,18 @@ const TwoStateSwitch = ({
   return (
     <div
       key={index}
-      className={`flex items-center bg-transparent border w-2/3 m-4 shadow-lg max-w-full ${
+      className={`flex items-center bg-transparent border w-5/6 sm:w-2/3 m-4 shadow-lg max-w-full ${
         isOverflowing ? "rounded-[35px]" : "rounded-full"
       }`}
     >
       <div
         className={`relative w-full  flex items-center rounded-full transition-colors duration-300
-         ${isOverflowing ? "flex-col h-24" : " h-12"}`}
+         ${isOverflowing ? "flex-col h-32" : " h-16"}`}
       >
         <div
-          className={`absolute h-12 w-1/2 transition-transform duration-200 bg-white bg-opacity-40 
+          className={`absolute h-16 w-1/2 transition-transform duration-200 bg-white bg-opacity-40 
           ${!isOverflowing && isOn ? "translate-x-full" : "translate-x-0"} 
-          ${isOverflowing ? "w-full h-12 rounded-b-[35px]" : "rounded-full"}
+          ${isOverflowing ? "w-full h-16 rounded-b-[35px]" : "rounded-full"}
           ${isOverflowing && !isOn ? "rounded-t-[35px] rounded-b-none" : ""}
           ${isOverflowing && isOn ? "translate-y-full" : "translate-y-0"}
           `}

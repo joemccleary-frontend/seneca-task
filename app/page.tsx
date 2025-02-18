@@ -83,12 +83,14 @@ export default function Home() {
   };
   return (
     <div
-      className={`h-screen w-screen flex flex-col justify-center items-center ${calculateBackgroundColour()}`}
+      className={`min-h-screen w-screen flex flex-col justify-start sm:pt-10 items-center ${calculateBackgroundColour()}`}
     >
-      <div className="text-white text-2xl m-6">{questionData.question}</div>
+      <div className="text-white text-2xl m-6 text-center sm:text-4xl">
+        {questionData.question}
+      </div>
       <div className="w-full">
         {questionData.answers.map((answer, index) => (
-          <div className="w-full place-items-center" key={index}>
+          <div className="w-full place-items-center text-lg" key={index}>
             {answer.incorrect.length === 1 ? (
               <TwoStateSwitch
                 answers={answer}
@@ -113,7 +115,7 @@ export default function Home() {
         ))}
       </div>
 
-      <div className="text-white text-2xl m-6">
+      <div className="text-white text-xl sm:text-3xl m-6">
         The answer is {correctPercentage === 100 ? "correct" : "incorrect"}
       </div>
     </div>
