@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import TwoStateSwitch from "./TwoStateSwitch";
 import ThreeStateSwitch from "./ThreeStateSwitch";
-
+import confetti from "canvas-confetti";
 interface Answer {
   incorrect: string[];
   correct: string;
@@ -99,9 +99,14 @@ export default function ToggleQuestion() {
 
     if (percentage === 100) {
       setIsLocked(true);
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+      });
       setTimeout(() => {
         moveToNextQuestion();
-      }, 1000);
+      }, 1500);
     }
   };
 
