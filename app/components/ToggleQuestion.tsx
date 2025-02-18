@@ -16,10 +16,11 @@ interface Question {
 
 export default function ToggleQuestion() {
   const [questionData, setQuestionData] = useState<Question[] | null>(null);
-  const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
-  const [correctAnswers, setCorrectAnswers] = useState<boolean[]>([]);
-  const [correctPercentage, setCorrectPercentage] = useState(0);
+  const [selectedAnswers, setSelectedAnswers] = useState<string[][]>([]);
+  const [correctAnswers, setCorrectAnswers] = useState<boolean[][]>([]);
+  const [correctPercentages, setCorrectPercentages] = useState<number[]>([]); // Store percentages per question
   const [currentQuestionNumber, setCurrentQuestionNumber] = useState(0);
+  const [isLocked, setIsLocked] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,24 +30,9 @@ export default function ToggleQuestion() {
         const data = await res.json();
         console.log(data);
         setQuestionData(data);
-        // Initialize selections when data loads
-        const initialCorrectIndex = Math.floor(
-          Math.random() * data[0].answers.length
-        );
-        setSelectedAnswers(
-          data[0].answers.map((answer: Answer, index: number) =>
-            index === initialCorrectIndex
-              ? answer.correct
-              : answer.incorrect[
-                  Math.floor(Math.random() * answer.incorrect.length)
-                ]
-          )
-        );
-        setCorrectAnswers(
-          data[0].answers.map(
-            (_: Answer, index: number) => index === initialCorrectIndex
-          )
-        );
+
+        // Initialize selections for the first question
+        initializeQuestion(data[0]);
       } catch (error) {
         console.error("Error fetching question data:", error);
       }
@@ -55,8 +41,29 @@ export default function ToggleQuestion() {
     fetchData();
   }, []);
 
-  const nextQuestion = () => {
-    setCurrentQuestionNumber(1);
+  const initializeQuestion = (question: Question) => {
+    const initialCorrectIndex = Math.floor(
+      Math.random() * question.answers.length
+    );
+
+    setSelectedAnswers((prev) => [
+      ...prev,
+      question.answers.map((answer, i) =>
+        i === initialCorrectIndex
+          ? answer.correct
+          : answer.incorrect[
+              Math.floor(Math.random() * answer.incorrect.length)
+            ]
+      ),
+    ]);
+
+    setCorrectAnswers((prev) => [
+      ...prev,
+      question.answers.map((_, i) => i === initialCorrectIndex),
+    ]);
+
+    // Initialize percentage for the current question as 0
+    setCorrectPercentages((prev) => [...prev, 0]);
   };
 
   const handleAnswerSelect = (
@@ -64,35 +71,68 @@ export default function ToggleQuestion() {
     selected: string,
     isCorrect: boolean
   ) => {
+    if (isLocked) return; // Prevent changes if locked
+
     const updatedCorrectAnswers = [...correctAnswers];
-    updatedCorrectAnswers[index] = isCorrect;
+    updatedCorrectAnswers[currentQuestionNumber][index] = isCorrect;
 
     setCorrectAnswers(updatedCorrectAnswers);
     setSelectedAnswers((prev) => {
       const newAnswers = [...prev];
-      newAnswers[index] = selected;
+      newAnswers[currentQuestionNumber][index] = selected;
       return newAnswers;
     });
 
-    const totalCorrect = updatedCorrectAnswers.filter(Boolean).length;
+    const totalCorrect =
+      updatedCorrectAnswers[currentQuestionNumber].filter(Boolean).length;
     const percentage = Math.round(
       (totalCorrect /
-        (questionData[currentQuestionNumber]?.answers.length || 1)) *
+        (questionData?.[currentQuestionNumber]?.answers.length || 1)) *
         100
     );
-    setCorrectPercentage(percentage);
-    if (percentage === 100) nextQuestion();
+
+    if (!isLocked) {
+      const updatedPercentages = [...correctPercentages];
+      updatedPercentages[currentQuestionNumber] = percentage;
+      setCorrectPercentages(updatedPercentages);
+    }
+
+    if (percentage === 100) {
+      setIsLocked(true);
+      setTimeout(() => {
+        moveToNextQuestion();
+      }, 1000);
+    }
   };
 
-  const calculateBackgroundColour = () => {
-    if (correctPercentage === 0)
-      return "bg-gradient-to-b from-[#f6b868] to-[#ee6c2e]";
-    if (correctPercentage <= 33)
-      return "bg-gradient-to-b from-[#fecc61] to-[#ff8300]";
-    if (correctPercentage <= 50)
-      return "bg-gradient-to-b from-[#fed954] to-[#ff9700]";
-    if (correctPercentage < 100)
-      return "bg-gradient-to-b from-[#ffe34b] to-[#ffab00]";
+  const moveToNextQuestion = () => {
+    if (!questionData || currentQuestionNumber >= questionData.length - 1)
+      return;
+
+    const nextQuestionIndex = currentQuestionNumber + 1;
+    initializeQuestion(questionData[nextQuestionIndex]);
+    setCurrentQuestionNumber(nextQuestionIndex);
+
+    setTimeout(() => {
+      window.scrollTo({
+        top:
+          document.getElementById(`question-${nextQuestionIndex}`)?.offsetTop ||
+          0,
+        behavior: "smooth",
+      });
+    }, 300);
+  };
+
+  const calculateBackgroundColour = (qIndex: number) => {
+    if (isLocked && correctPercentages[qIndex] === 100) {
+      return "bg-gradient-to-b from-[#75dfc2] to-[#59cada]";
+    }
+    const percentage = correctPercentages[qIndex];
+
+    if (percentage === 0) return "bg-gradient-to-b from-[#f6b868] to-[#ee6c2e]";
+    if (percentage <= 33) return "bg-gradient-to-b from-[#fecc61] to-[#ff8300]";
+    if (percentage <= 50) return "bg-gradient-to-b from-[#fed954] to-[#ff9700]";
+    if (percentage < 100) return "bg-gradient-to-b from-[#ffe34b] to-[#ffab00]";
     return "bg-gradient-to-b from-[#75dfc2] to-[#59cada]";
   };
 
@@ -104,40 +144,51 @@ export default function ToggleQuestion() {
 
   return (
     <div
-      className={`min-h-screen w-screen flex flex-col justify-start sm:pt-10 items-center ${calculateBackgroundColour()}`}
+      className={`min-h-screen w-full flex flex-col justify-start items-center `}
     >
-      <div className="text-white text-2xl m-6 text-center sm:text-4xl">
-        {questionData[currentQuestionNumber].question}
-      </div>
-      <div className="w-full">
-        {questionData[currentQuestionNumber].answers.map((answer, index) => (
-          <div className="w-full place-items-center text-lg" key={index}>
-            {answer.incorrect.length === 1 ? (
-              <TwoStateSwitch
-                answers={answer}
-                defaultSelected={selectedAnswers[index]}
-                onSelect={(selected, isCorrect) =>
-                  handleAnswerSelect(index, selected, isCorrect)
-                }
-                correctPercentage={correctPercentage}
-                index={index}
-              />
-            ) : (
-              <ThreeStateSwitch
-                answers={answer}
-                defaultSelected={selectedAnswers[index]}
-                onSelect={(selected, isCorrect) =>
-                  handleAnswerSelect(index, selected, isCorrect)
-                }
-                correctPercentage={correctPercentage}
-              />
-            )}
+      {questionData
+        .slice(0, currentQuestionNumber + 1)
+        .map((question, qIndex) => (
+          <div
+            key={qIndex}
+            id={`question-${qIndex}`}
+            className={`w-full h-screen ${calculateBackgroundColour(qIndex)}`}
+          >
+            <div className="text-white text-2xl m-6 text-center sm:text-4xl">
+              {question.question}
+            </div>
+            <div className="w-full">
+              {question.answers.map((answer, index) => (
+                <div className="w-full place-items-center text-lg" key={index}>
+                  {answer.incorrect.length === 1 ? (
+                    <TwoStateSwitch
+                      answers={answer}
+                      defaultSelected={selectedAnswers[qIndex]?.[index] || ""}
+                      onSelect={(selected, isCorrect) =>
+                        handleAnswerSelect(index, selected, isCorrect)
+                      }
+                      correctPercentage={correctPercentages[qIndex]}
+                      index={index}
+                    />
+                  ) : (
+                    <ThreeStateSwitch
+                      answers={answer}
+                      defaultSelected={selectedAnswers[qIndex]?.[index] || ""}
+                      onSelect={(selected, isCorrect) =>
+                        handleAnswerSelect(index, selected, isCorrect)
+                      }
+                      correctPercentage={correctPercentages[qIndex]}
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="text-white text-xl sm:text-3xl m-6 text-center">
+              The answer is{" "}
+              {correctPercentages[qIndex] === 100 ? "correct" : "incorrect"}
+            </div>
           </div>
         ))}
-      </div>
-      <div className="text-white text-xl sm:text-3xl m-6">
-        The answer is {correctPercentage === 100 ? "correct" : "incorrect"}
-      </div>
     </div>
   );
 }

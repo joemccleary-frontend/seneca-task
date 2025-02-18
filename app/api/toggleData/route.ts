@@ -34,15 +34,15 @@ export async function GET() {
           correct: "Chester",
         },
         {
-          incorrect: ["Arsenal"],
+          incorrect: ["Arsenal", "Chelsea"],
           correct: "Chestera",
         },
         {
-          incorrect: ["n"],
+          incorrect: ["n", "he"],
           correct: "ASd",
         },
         {
-          incorrect: ["da"],
+          incorrect: ["da", "ajs"],
           correct: "dadsnajk",
         },
       ],
