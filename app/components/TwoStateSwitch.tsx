@@ -52,7 +52,7 @@ const TwoStateSwitch = ({
   }, [defaultSelected]);
 
   const handleClick = (value: string) => {
-    if (correctPercentage === 100) return;
+    if (correctPercentage === 100 || value === selectedValue) return;
     setIsOn(!isOn);
     setSelectedValue(value);
     const isCorrect = value === answers.correct;
@@ -86,14 +86,14 @@ const TwoStateSwitch = ({
             }}
             key={index}
             ref={spanRef}
-            className={`relative z-10 flex-1 text-center transition-colors duration-300 flex justify-center items-center ${
-              correctPercentage !== 100 ? "cursor-pointer" : ""
-            }
-                    ${
-                      selectedValue !== option
-                        ? "text-white hover:text-gray-100"
-                        : "text-[#9f938b]"
-                    } ${!isOverflowing ? "min-h-full " : ""}`}
+            className={`relative z-10 flex-1 text-center transition-colors duration-300 flex justify-center items-center 
+              ${correctPercentage !== 100 ? "cursor-pointer" : ""}
+              ${
+                selectedValue !== option
+                  ? "text-white hover:text-gray-100"
+                  : "text-[#9f938b]"
+              } 
+              ${!isOverflowing ? "min-h-full " : ""}`}
           >
             {option}
           </span>

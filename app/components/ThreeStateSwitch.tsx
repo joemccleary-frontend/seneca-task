@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface Answer {
   incorrect: string[];
@@ -9,13 +9,29 @@ interface Answer {
 interface SwitchProps {
   answers: Answer;
   onSelect: (selected: string, isCorrect: boolean) => void;
+  defaultSelected: string;
   correctPercentage: number;
 }
 
-const Switch = ({ answers, onSelect, correctPercentage }: SwitchProps) => {
+const Switch = ({
+  answers,
+  onSelect,
+  defaultSelected,
+  correctPercentage,
+}: SwitchProps) => {
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
   const [toggleState, SetToggleState] = useState(0);
   const options = [answers.correct, ...answers.incorrect];
+
+  useEffect(() => {
+    if (defaultSelected) {
+      setSelectedValue(defaultSelected);
+      console.log("correcct", answers.correct, answers);
+      console.log("selected", defaultSelected);
+      if (answers.correct !== defaultSelected) SetToggleState(0);
+      onSelect(defaultSelected, answers.correct == defaultSelected);
+    }
+  }, [defaultSelected]);
 
   const handleClick = (value: string, index: number) => {
     if (correctPercentage === 100) return;
