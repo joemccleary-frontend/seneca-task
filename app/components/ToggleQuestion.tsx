@@ -4,17 +4,7 @@ import { useEffect, useState } from "react";
 import TwoStateSwitch from "./TwoStateSwitch";
 import ThreeStateSwitch from "./ThreeStateSwitch";
 import confetti from "canvas-confetti";
-
-interface Answer {
-  incorrect: string[];
-  correct: string;
-  randomizedOptions: string[];
-}
-interface Question {
-  questionNumber: number;
-  question: string;
-  answers: Answer[];
-}
+import { Question } from "../types/toggleQuestions";
 
 export default function ToggleQuestion() {
   const [questionData, setQuestionData] = useState<Question[] | null>(null);

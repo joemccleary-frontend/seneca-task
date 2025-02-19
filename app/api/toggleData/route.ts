@@ -32,11 +32,11 @@ export async function GET() {
           correct: "Chester",
         },
         {
-          incorrect: ["Arsenal", "Chelsea"],
+          incorrect: ["Arsenal"],
           correct: "Plymouth",
         },
         {
-          incorrect: ["Barcelona", "Real Madrid"],
+          incorrect: ["Barcelona"],
           correct: "Grimsby",
         },
         {

@@ -1,11 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
-
-interface Answer {
-  incorrect: string[];
-  correct: string;
-  randomizedOptions: string[];
-}
+import { Answer } from "../types/toggleQuestions";
 
 interface SwitchProps {
   answers: Answer;
