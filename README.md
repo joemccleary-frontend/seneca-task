@@ -4,9 +4,6 @@ This is the repo for my solution to the front end technical task for Seneca.
 
 The component tests the user's knowledge of a topic, by having them move a series of toggles into the correct positions:
 
-The project can be accessed here:
-[url]
-
 ### Project requirements
 
 - The solution for that question locks once all correct answers have been selected. The toggles animate between states and the background colour changes depending on how many correct answers there are.
@@ -30,7 +27,7 @@ The project can be accessed here:
 
 ## Running the project
 
-If you wish to run the development server:
+To run the project locally, download the repo. Then to run the development server:
 
 ```bash
 npm run dev
