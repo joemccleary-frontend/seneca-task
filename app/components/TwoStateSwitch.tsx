@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 interface Answer {
   incorrect: string[];
   correct: string;
+  randomizedOptions: string[];
 }
 
 interface SwitchProps {
@@ -22,12 +23,11 @@ const TwoStateSwitch = ({
   index,
 }: SwitchProps) => {
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
-  const options = [answers.correct, ...answers.incorrect];
-  const [isOn, setIsOn] = useState(false);
+  const options = answers.randomizedOptions;
+  const [isRight, setIsRight] = useState(false);
   const [isOverflowing, setIsOverflowing] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const spanRef = useRef<HTMLSpanElement>(null);
-
   // Function to check if text is overflowing
   const checkOverflow = () => {
     if (containerRef.current && spanRef.current) {
@@ -37,6 +37,7 @@ const TwoStateSwitch = ({
     }
   };
 
+  //check if screen has been resized for overflowing
   useEffect(() => {
     checkOverflow();
     window.addEventListener("resize", checkOverflow);
@@ -46,14 +47,20 @@ const TwoStateSwitch = ({
   useEffect(() => {
     if (defaultSelected) {
       setSelectedValue(defaultSelected);
-      if (answers.correct !== defaultSelected) setIsOn(true);
+
+      //find index of default selected in randomizedoptions array
+      const indexInRandomizedOptions = answers.randomizedOptions.findIndex(
+        (option) => option === defaultSelected
+      );
+      //0 is falsy
+      if (indexInRandomizedOptions) setIsRight(true);
       onSelect(defaultSelected, answers.correct == defaultSelected);
     }
   }, [defaultSelected]);
 
   const handleClick = (value: string) => {
     if (correctPercentage === 100 || value === selectedValue) return;
-    setIsOn(!isOn);
+    setIsRight(!isRight);
     setSelectedValue(value);
     const isCorrect = value === answers.correct;
     onSelect(value, isCorrect);
@@ -72,10 +79,10 @@ const TwoStateSwitch = ({
       >
         <div
           className={`absolute h-16 w-1/2 transition-transform duration-200 bg-white bg-opacity-40 
-          ${!isOverflowing && isOn ? "translate-x-full" : "translate-x-0"} 
+          ${!isOverflowing && isRight ? "translate-x-full" : "translate-x-0"} 
           ${isOverflowing ? "w-full h-16 rounded-b-[35px]" : "rounded-full"}
-          ${isOverflowing && !isOn ? "rounded-t-[35px] rounded-b-none" : ""}
-          ${isOverflowing && isOn ? "translate-y-full" : "translate-y-0"}
+          ${isOverflowing && !isRight ? "rounded-t-[35px] rounded-b-none" : ""}
+          ${isOverflowing && isRight ? "translate-y-full" : "translate-y-0"}
           `}
           ref={containerRef}
         />

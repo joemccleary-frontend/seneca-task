@@ -8,6 +8,7 @@ import confetti from "canvas-confetti";
 interface Answer {
   incorrect: string[];
   correct: string;
+  randomizedOptions: string[];
 }
 interface Question {
   questionNumber: number;
@@ -21,7 +22,27 @@ export default function ToggleQuestion() {
   const [correctAnswers, setCorrectAnswers] = useState<boolean[][]>([]);
   const [correctPercentages, setCorrectPercentages] = useState<number[]>([]); // Store percentages per question
   const [currentQuestionNumber, setCurrentQuestionNumber] = useState(0);
-  const [isLocked, setIsLocked] = useState(false);
+  const [lockedQuestions, setLockedQuestions] = useState<boolean[]>([]);
+
+  const buildRandomizedOptions = (questions: Question[]): Question[] => {
+    return questions.map((question) => ({
+      ...question,
+      answers: question.answers.map((answer) => ({
+        ...answer,
+        randomizedOptions: shuffleArray([answer.correct, ...answer.incorrect]),
+      })),
+    }));
+  };
+
+  // Helper function to shuffle an array (Fisher-Yates shuffle)
+  const shuffleArray = <T,>(array: T[]): T[] => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,8 +50,8 @@ export default function ToggleQuestion() {
       try {
         const res = await fetch("/api/toggleData");
         const data = await res.json();
-        console.log(data);
-        setQuestionData(data);
+        const randomOptions = buildRandomizedOptions(data);
+        setQuestionData(randomOptions);
 
         // Initialize selections for the first question
         initializeQuestion(data[0]);
@@ -63,8 +84,10 @@ export default function ToggleQuestion() {
       question.answers.map((_, i) => i === initialCorrectIndex),
     ]);
 
-    // Initialize percentage for the current question as 0
     setCorrectPercentages((prev) => [...prev, 0]);
+
+    // Ensure new questions are unlocked
+    setLockedQuestions((prev) => [...prev, false]);
   };
 
   const handleAnswerSelect = (
@@ -72,7 +95,7 @@ export default function ToggleQuestion() {
     selected: string,
     isCorrect: boolean
   ) => {
-    if (isLocked) return; // Prevent changes if locked
+    if (lockedQuestions[currentQuestionNumber]) return; // Prevent changes if locked
 
     const updatedCorrectAnswers = [...correctAnswers];
     updatedCorrectAnswers[currentQuestionNumber][index] = isCorrect;
@@ -84,6 +107,7 @@ export default function ToggleQuestion() {
       return newAnswers;
     });
 
+    //calculate percentage
     const totalCorrect =
       updatedCorrectAnswers[currentQuestionNumber].filter(Boolean).length;
     const percentage = Math.round(
@@ -92,23 +116,29 @@ export default function ToggleQuestion() {
         100
     );
 
-    if (!isLocked) {
-      const updatedPercentages = [...correctPercentages];
-      updatedPercentages[currentQuestionNumber] = percentage;
-      setCorrectPercentages(updatedPercentages);
-    }
-
+    //if all correct trigger next question
     if (percentage === 100) {
-      setIsLocked(true);
+      // Lock only the current question
+      setLockedQuestions((prev) => {
+        const newLocks = [...prev];
+        newLocks[currentQuestionNumber] = true;
+        return newLocks;
+      });
+
       confetti({
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 },
       });
+
       setTimeout(() => {
         moveToNextQuestion();
       }, 1800);
     }
+    //update percentage tracker
+    const updatedPercentages = [...correctPercentages];
+    updatedPercentages[currentQuestionNumber] = percentage;
+    setCorrectPercentages(updatedPercentages);
   };
 
   const moveToNextQuestion = () => {
@@ -130,7 +160,7 @@ export default function ToggleQuestion() {
   };
 
   const calculateBackgroundColour = (qIndex: number) => {
-    if (isLocked && correctPercentages[qIndex] === 100) {
+    if (correctPercentages[qIndex] === 100) {
       return "bg-gradient-to-b from-[#75dfc2] to-[#59cada]";
     }
     const percentage = correctPercentages[qIndex];
