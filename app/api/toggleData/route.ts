@@ -37,7 +37,7 @@ export async function GET() {
         },
         {
           incorrect: ["Barcelona", "Real Madrid"],
-          correct: "Grimsby Town",
+          correct: "Grimsby",
         },
         {
           incorrect: ["Bayern Munich", "PSG"],
