@@ -4,7 +4,6 @@ import { NextResponse } from "next/server";
 export async function GET() {
   const questionData = [
     {
-      questionNumber: 1,
       question: "An animal cell contains",
       answers: [
         {
@@ -26,7 +25,6 @@ export async function GET() {
       ],
     },
     {
-      questionNumber: 2,
       question: "Who is the best football team",
       answers: [
         {

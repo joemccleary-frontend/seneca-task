@@ -24,12 +24,13 @@ export default function ToggleQuestion() {
   const [currentQuestionNumber, setCurrentQuestionNumber] = useState(0);
   const [lockedQuestions, setLockedQuestions] = useState<boolean[]>([]);
 
-  const buildRandomizedOptions = (questions: Question[]): Question[] => {
-    return questions.map((question) => ({
+  const buildRandomizedQuestions = (questions: Question[]): Question[] => {
+    const shuffledQuestions = shuffleArray([...questions]); // Shuffle the questions
+    return shuffledQuestions.map((question) => ({
       ...question,
       answers: question.answers.map((answer) => ({
         ...answer,
-        randomizedOptions: shuffleArray([answer.correct, ...answer.incorrect]),
+        randomizedOptions: shuffleArray([answer.correct, ...answer.incorrect]), //shuffle the answers
       })),
     }));
   };
@@ -50,11 +51,14 @@ export default function ToggleQuestion() {
       try {
         const res = await fetch("/api/toggleData");
         const data = await res.json();
-        const randomOptions = buildRandomizedOptions(data);
-        setQuestionData(randomOptions);
+        // Randomize questions and answers
+        const randomizedData = buildRandomizedQuestions(data);
+        setQuestionData(randomizedData);
 
-        // Initialize selections for the first question
-        initializeQuestion(data[0]);
+        // Initialize selections for the first question (if data exists)
+        if (randomizedData.length > 0) {
+          initializeQuestion(randomizedData[0]);
+        }
       } catch (error) {
         console.error("Error fetching question data:", error);
       }
