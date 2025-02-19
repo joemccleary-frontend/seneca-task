@@ -204,14 +204,11 @@ export default function ToggleQuestion() {
                         handleAnswerSelect(index, selected, isCorrect)
                       }
                       correctPercentage={correctPercentages[qIndex]}
-                      index={index}
                     />
                   ) : (
                     <ThreeStateSwitch
                       answers={answer}
                       defaultSelected={selectedAnswers[qIndex]?.[index] || ""}
-                      defaultSelectedIndex={index}
-                      selectedAnswers={selectedAnswers}
                       onSelect={(selected, isCorrect) =>
                         handleAnswerSelect(index, selected, isCorrect)
                       }

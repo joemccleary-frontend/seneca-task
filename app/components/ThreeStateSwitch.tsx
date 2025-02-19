@@ -4,14 +4,13 @@ import React, { useState, useEffect, useRef } from "react";
 interface Answer {
   incorrect: string[];
   correct: string;
+  randomizedOptions: string[];
 }
 
 interface SwitchProps {
   answers: Answer;
   onSelect: (selected: string, isCorrect: boolean) => void;
   defaultSelected: string;
-  defaultSelectedIndex: number;
-  selectedAnswers: string[][];
   correctPercentage: number;
 }
 
@@ -19,13 +18,11 @@ const ThreeStateSwitch = ({
   answers,
   onSelect,
   defaultSelected,
-  defaultSelectedIndex,
-  selectedAnswers,
   correctPercentage,
 }: SwitchProps) => {
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
   const [toggleState, SetToggleState] = useState(0);
-  const options = [answers.correct, ...answers.incorrect];
+  const options = answers.randomizedOptions;
   const [isOverflowing, setIsOverflowing] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const spanRef = useRef<HTMLSpanElement>(null);
@@ -47,15 +44,13 @@ const ThreeStateSwitch = ({
   useEffect(() => {
     if (defaultSelected) {
       setSelectedValue(defaultSelected);
-      console.log("correcct", answers.correct, answers);
-      console.log(
-        "selected",
-        defaultSelected,
-        defaultSelectedIndex,
-        selectedAnswers
-      );
       //get index of selected
-      SetToggleState(1);
+      //find index of default selected in randomizedoptions array
+      const indexInRandomizedOptions = answers.randomizedOptions.findIndex(
+        (option) => option === defaultSelected
+      );
+      SetToggleState(indexInRandomizedOptions);
+
       onSelect(defaultSelected, answers.correct == defaultSelected);
     }
   }, [defaultSelected]);

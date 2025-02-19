@@ -35,15 +35,15 @@ export async function GET() {
         },
         {
           incorrect: ["Arsenal", "Chelsea"],
-          correct: "Chestera",
+          correct: "Plymouth",
         },
         {
-          incorrect: ["n", "he"],
-          correct: "ASd",
+          incorrect: ["Barcelona", "Real Madrid"],
+          correct: "Grimsby Town",
         },
         {
-          incorrect: ["da", "ajs"],
-          correct: "dadsnajk",
+          incorrect: ["Bayern Munich", "PSG"],
+          correct: "Rochdale",
         },
       ],
     },

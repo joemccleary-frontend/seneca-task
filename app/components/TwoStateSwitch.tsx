@@ -12,7 +12,6 @@ interface SwitchProps {
   onSelect: (selected: string, isCorrect: boolean) => void;
   defaultSelected: string;
   correctPercentage: number;
-  index: number;
 }
 
 const TwoStateSwitch = ({
@@ -20,7 +19,6 @@ const TwoStateSwitch = ({
   onSelect,
   defaultSelected,
   correctPercentage,
-  index,
 }: SwitchProps) => {
   const [selectedValue, setSelectedValue] = useState<string | null>(null);
   const options = answers.randomizedOptions;
@@ -68,7 +66,6 @@ const TwoStateSwitch = ({
 
   return (
     <div
-      key={index}
       className={`flex items-center bg-transparent border w-5/6 sm:w-2/3 m-4 shadow-lg max-w-full ${
         isOverflowing ? "rounded-[35px]" : "rounded-full"
       }`}
